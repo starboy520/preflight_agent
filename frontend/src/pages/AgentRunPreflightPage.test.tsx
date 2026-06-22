@@ -208,6 +208,45 @@ describe("AgentRunPreflightPage", () => {
     expect(screen.getByText(/skill report.generate uses action_tier=T3/i)).toBeInTheDocument();
   });
 
+  it("separates result metrics from long explanatory notes", async () => {
+    const user = userEvent.setup();
+    mockFetch({
+      ...readyResponse,
+      decision: "requires_approval",
+      can_execute: false,
+      governance: {
+        highest_action_tier: "T2",
+        approval_required: true,
+        approval_reasons: ["tool artifact.write uses exposure_mode=ask"]
+      },
+      sandbox: {
+        required: true,
+        highest_level: "L2",
+        routes: [
+          {
+            task_id: "t2",
+            sandbox_level: "L2",
+            reason: "prod environment upgrades L1 sandbox to L2"
+          }
+        ]
+      },
+      audit_notes: ["dag_validated", "budget_prechecked", "sandbox_route_estimated", "approval_required"]
+    });
+    render(<AgentRunPreflightPage />);
+
+    await user.click(screen.getByRole("button", { name: /Validate/i }));
+
+    const summary = await screen.findByRole("region", { name: /preflight result summary/i });
+    const metrics = within(summary).getByRole("group", { name: /result metrics/i });
+    const explanations = within(summary).getByRole("group", { name: /result explanations/i });
+
+    expect(within(metrics).getByText(/Estimated tokens/i)).toBeInTheDocument();
+    expect(within(metrics).getByText(/Highest action tier/i)).toBeInTheDocument();
+    expect(within(explanations).getByText(/tool artifact.write uses exposure_mode=ask/i)).toBeInTheDocument();
+    expect(within(explanations).getByText(/t2/i)).toBeInTheDocument();
+    expect(within(explanations).getByText(/sandbox_route_estimated/i)).toBeInTheDocument();
+  });
+
   it("shows normalized plan JSON", async () => {
     const user = userEvent.setup();
     mockFetch(readyResponse);

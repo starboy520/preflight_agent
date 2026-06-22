@@ -34,63 +34,78 @@ export function PreflightResultSummary({ result, status, errorMessage }: Preflig
   }
 
   return (
-    <section className="panel summary-grid">
-      <div className="status-row full">
+    <section className="panel result-summary" aria-label="Preflight result summary">
+      <div className="result-status">
         <span className={`badge ${result.decision}`}>{decisionLabel(result.decision)}</span>
-        <span>{result.can_execute ? "Can execute directly" : "Execution is not allowed yet"}</span>
+        <strong>{result.can_execute ? "Can execute directly" : "Execution is not allowed yet"}</strong>
       </div>
-      <div>
-        <h3>Budget summary</h3>
-        <dl>
-          <dt>Estimated tokens</dt>
-          <dd>{result.budget.estimated_tokens}</dd>
-          <dt>Remaining after preflight</dt>
-          <dd>{result.budget.remaining_after_preflight}</dd>
-          <dt>Budget status</dt>
-          <dd>{result.budget.budget_status}</dd>
-        </dl>
+
+      <div className="summary-section summary-metrics" role="group" aria-label="Result metrics">
+        <div className="summary-block">
+          <h3>Budget summary</h3>
+          <dl className="metric-list">
+            <dt>Estimated tokens</dt>
+            <dd>{result.budget.estimated_tokens}</dd>
+            <dt>Remaining after preflight</dt>
+            <dd>{result.budget.remaining_after_preflight}</dd>
+            <dt>Budget status</dt>
+            <dd>{result.budget.budget_status}</dd>
+          </dl>
+        </div>
+        <div className="summary-block">
+          <h3>Governance summary</h3>
+          <dl className="metric-list">
+            <dt>Highest action tier</dt>
+            <dd>{result.governance.highest_action_tier}</dd>
+            <dt>Approval required</dt>
+            <dd>{result.governance.approval_required ? "yes" : "no"}</dd>
+          </dl>
+        </div>
+        <div className="summary-block">
+          <h3>Sandbox summary</h3>
+          <dl className="metric-list">
+            <dt>Required</dt>
+            <dd>{result.sandbox.required ? "yes" : "no"}</dd>
+            <dt>Highest level</dt>
+            <dd>{result.sandbox.highest_level}</dd>
+          </dl>
+        </div>
       </div>
-      <div>
-        <h3>Governance summary</h3>
-        <dl>
-          <dt>Highest action tier</dt>
-          <dd>{result.governance.highest_action_tier}</dd>
-          <dt>Approval required</dt>
-          <dd>{result.governance.approval_required ? "yes" : "no"}</dd>
-        </dl>
+
+      <div className="summary-section summary-explanations" role="group" aria-label="Result explanations">
         {result.governance.approval_reasons.length > 0 ? (
-          <ul className="compact-list">
-            {result.governance.approval_reasons.map((reason) => (
-              <li key={reason}>{reason}</li>
-            ))}
-          </ul>
+          <div className="note-block">
+            <h3>Approval reasons</h3>
+            <ul className="note-list">
+              {result.governance.approval_reasons.map((reason) => (
+                <li key={reason}>{reason}</li>
+              ))}
+            </ul>
+          </div>
         ) : null}
-      </div>
-      <div>
-        <h3>Sandbox routes</h3>
-        <dl>
-          <dt>Required</dt>
-          <dd>{result.sandbox.required ? "yes" : "no"}</dd>
-          <dt>Highest level</dt>
-          <dd>{result.sandbox.highest_level}</dd>
-        </dl>
         {result.sandbox.routes.length > 0 ? (
-          <ul className="compact-list">
-            {result.sandbox.routes.map((route) => (
-              <li key={`${route.task_id}-${route.sandbox_level}`}>
-                {route.task_id}: {route.sandbox_level} - {route.reason}
-              </li>
+          <div className="note-block">
+            <h3>Sandbox routes</h3>
+            <ul className="note-list">
+              {result.sandbox.routes.map((route) => (
+                <li key={`${route.task_id}-${route.sandbox_level}`}>
+                  <span className="note-kicker">{route.task_id}</span>
+                  <span>
+                    {route.sandbox_level}: {route.reason}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        <div className="note-block">
+          <h3>Audit notes</h3>
+          <ul className="note-list note-list-inline">
+            {result.audit_notes.map((note) => (
+              <li key={note}>{note}</li>
             ))}
           </ul>
-        ) : null}
-      </div>
-      <div>
-        <h3>Audit notes</h3>
-        <ul className="compact-list">
-          {result.audit_notes.map((note) => (
-            <li key={note}>{note}</li>
-          ))}
-        </ul>
+        </div>
       </div>
     </section>
   );
