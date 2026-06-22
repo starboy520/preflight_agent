@@ -549,8 +549,8 @@ frontend/
 页面区域：
 
 - JSON 输入区：展示和编辑完整请求 JSON，预置 sample。
-- 参数区：单独展示并编辑 `environment`、`remaining_token_budget`、`max_parallel_tasks`。
-- 操作区：`Load sample`、`Validate`、`Reset`。
+- 示例预设区：单独展示并编辑 `environment`、`remaining_token_budget`、`max_parallel_tasks`，用于生成 sample JSON。
+- 操作区：`Load sample`、`Validate`、`Reset`；其中 `Validate` 只提交 JSON 输入区内容。
 - 结果区：状态 badge、Budget summary、Governance summary、Sandbox routes、Errors、Warnings、Audit notes、Normalized plan JSON。
 
 ### 5.2 状态流转
@@ -558,7 +558,7 @@ frontend/
 前端维护以下状态：
 
 - `empty`：尚未执行预检，显示 sample 输入和空结果提示。
-- `editing`：用户正在编辑 JSON 或参数，提示结果可能不是最新。
+- `editing`：用户正在编辑 JSON 或示例预设参数，提示结果可能不是最新。
 - `loading`：请求进行中，按钮 disabled，展示 loading 状态。
 - `result`：后端返回成功响应，展示完整 Preflight result。
 - `error`：本地 JSON 校验失败或接口请求失败。
@@ -603,7 +603,7 @@ JSON.parse(jsonText)
 - 不调用后端接口。
 - 保留用户当前输入，方便继续编辑。
 
-参数区的 `environment`、`remaining_token_budget`、`max_parallel_tasks` 会覆盖 JSON 中对应字段，避免同一字段在两个位置编辑后不一致。
+示例预设区的 `environment`、`remaining_token_budget`、`max_parallel_tasks` 只在点击 `Load sample` 时写入 JSON；点击 `Validate` 时，前端只提交 JSON 输入区中的内容，避免校验请求存在隐藏覆盖逻辑。
 
 ### 5.5 结果展示设计
 

@@ -44,12 +44,13 @@ export function usePreflight() {
   }
 
   function loadSample() {
-    setJsonText(sampleJson());
-    setParams({
-      environment: samplePreflightRequest.environment,
-      remaining_token_budget: samplePreflightRequest.remaining_token_budget,
-      max_parallel_tasks: samplePreflightRequest.max_parallel_tasks
-    });
+    setJsonText(
+      sampleJson({
+        environment: params.environment,
+        remaining_token_budget: Number(params.remaining_token_budget),
+        max_parallel_tasks: Number(params.max_parallel_tasks)
+      })
+    );
     setResult(null);
     setErrorMessage(null);
     setStatus("empty");
@@ -73,18 +74,11 @@ export function usePreflight() {
       return;
     }
 
-    const request: PreflightRequest = {
-      ...parsed,
-      environment: params.environment,
-      remaining_token_budget: Number(params.remaining_token_budget),
-      max_parallel_tasks: Number(params.max_parallel_tasks)
-    };
-
     setStatus("loading");
     setErrorMessage(null);
 
     try {
-      const response = await runPreflight(request);
+      const response = await runPreflight(parsed);
       setResult(response);
       setStatus("result");
     } catch (error) {

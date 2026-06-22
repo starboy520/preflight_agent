@@ -11,7 +11,7 @@ export function PreflightParameterPanel({ params, disabled, onChange }: Prefligh
   return (
     <section className="panel">
       <div className="panel-heading">
-        <h2>Parameters</h2>
+        <h2>Sample preset</h2>
       </div>
       <div className="field-grid">
         <label>
