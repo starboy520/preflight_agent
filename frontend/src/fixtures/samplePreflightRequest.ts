@@ -1,4 +1,10 @@
-import type { PreflightRequest } from "../types/preflight";
+import type { Environment, PreflightRequest } from "../types/preflight";
+
+export interface SamplePreflightOptions {
+  environment?: Environment;
+  remaining_token_budget?: number;
+  max_parallel_tasks?: number;
+}
 
 export const samplePreflightRequest: PreflightRequest = {
   thread_id: "thd-001",
@@ -53,6 +59,13 @@ export const samplePreflightRequest: PreflightRequest = {
   ]
 };
 
-export function sampleJson(): string {
-  return JSON.stringify(samplePreflightRequest, null, 2);
+export function sampleJson(options: SamplePreflightOptions = {}): string {
+  return JSON.stringify(
+    {
+      ...samplePreflightRequest,
+      ...options
+    },
+    null,
+    2
+  );
 }

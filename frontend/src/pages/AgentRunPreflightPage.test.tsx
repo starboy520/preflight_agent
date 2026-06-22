@@ -96,7 +96,7 @@ describe("AgentRunPreflightPage", () => {
     expect(screen.getByRole("button", { name: /Validating/i })).toBeDisabled();
   });
 
-  it("sends parameter panel overrides with the JSON request", async () => {
+  it("validates the editor JSON without applying sample preset controls", async () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch(readyResponse);
     render(<AgentRunPreflightPage />);
@@ -111,6 +111,25 @@ describe("AgentRunPreflightPage", () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     const request = JSON.parse(init.body as string);
+    expect(request).toMatchObject({
+      environment: "prod",
+      remaining_token_budget: 9000,
+      max_parallel_tasks: 2
+    });
+  });
+
+  it("uses sample preset controls when loading a sample request", async () => {
+    const user = userEvent.setup();
+    render(<AgentRunPreflightPage />);
+
+    await user.selectOptions(screen.getByLabelText(/environment/i), "staging");
+    await user.clear(screen.getByLabelText(/remaining token budget/i));
+    await user.type(screen.getByLabelText(/remaining token budget/i), "4500");
+    await user.clear(screen.getByLabelText(/max parallel tasks/i));
+    await user.type(screen.getByLabelText(/max parallel tasks/i), "1");
+    await user.click(screen.getByRole("button", { name: /Load sample/i }));
+
+    const request = JSON.parse((screen.getByLabelText(/Plan JSON/i) as HTMLTextAreaElement).value);
     expect(request).toMatchObject({
       environment: "staging",
       remaining_token_budget: 4500,
